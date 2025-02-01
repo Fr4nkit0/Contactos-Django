@@ -1,0 +1,15 @@
+{% extends 'layouts/base.html' %}
+
+{% block contacts %}
+<div class="row border">
+    <div class="card">
+        <form action="{% url 'create_one'  %}" method="POST" >
+
+        {% csrf_token %}
+        {% include "form.html" %}
+   
+        </form>
+    </div>
+
+</div>
+{% endblock contacts %} 

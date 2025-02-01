@@ -1,0 +1,22 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+
+{% block contacts %}
+
+<div class="row border">
+    <div class="card">
+        <form action="{% url 'update_by_id' contact_id=id %}" method="POST" class="mt-6 ">
+            {% csrf_token %}
+            {% include "form.html" %}
+        </form>
+    </div>
+
+
+
+</div>
+
+
+
+
+{% endblock contacts %}
