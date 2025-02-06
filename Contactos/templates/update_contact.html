@@ -1,0 +1,28 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+
+{% block contacts %}
+
+<div class="row border">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title text-center text-primary">Actualizar Contacto</h5>
+            <form action="{% url 'update_by_id' contact_id=id %}" method="POST" class="mt-6 ">
+                {% csrf_token %}
+                {% include "form.html" %}
+
+                <a href="{% url 'find_by_id' id %}" class="btn btn-outline-primary">Atras</a>
+                <input type="submit" value="Enviar" class="btn btn-outline-primary">
+
+            </form>
+        </div>
+
+
+    </div>
+</div>
+
+
+
+
+{% endblock contacts %}

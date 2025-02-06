@@ -1,0 +1,58 @@
+{% load static %}
+
+<div class="card" style="width: 25rem;">
+    <div class="header d-flex justify-content-center">
+        <i class="bi bi-person-circle" style="font-size: 5rem;"></i>
+    </div>
+    <div class="card-body ">
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <p class="text-center fw-bold text-primary">{{ contact.name }}</p>
+            </li>
+            <li class="list-group-item d-flex align-items-center">
+               <img src="{% static 'img/telephone.svg'%}" class="btn btn-outline-primary me-2"  alt=""> <span> {{ contact.phone }} </span>
+            </li>
+            <li class="list-group-item">
+               <img src="{% static 'img/envelope.svg' %}" class = "btn btn-outline-primary me-2" alt=""> <span class="aling-middle">{{ contact.email }}</span>
+            </li>
+        </ul>
+    </div>
+
+    <div class="card-footer d-flex align-items-center justify-content-center">
+        <a href="{% url 'find_all' %}" class="btn btn-outline-primary mx-1">
+            <i class="bi bi-box-arrow-left mx-1"></i> Atras 
+        </a>
+        <a href="{% url 'update_by_id' contact_id=contact.id %}" class="btn btn-outline-secondary mx-1">
+            <i class="bi bi-pencil-square"></i> Editar
+        </a>
+        <button class="btn btn-outline-danger mx-1" data-bs-toggle="modal"
+            data-bs-target="#modal-delete{{ contact.id }}">
+            <i class="bi bi-trash3-fill"></i> Eliminar
+        </button>
+    </div>
+
+</div>
+      
+<!-- Modal para eliminar contacto -->
+<div class="modal fade" id="modal-delete{{ contact.id }}" tabindex="-1" aria-labelledby="modalLabel{{ contact.id }}"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel{{ contact.id }}">Confirmación de Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p>¿Estás seguro de que deseas eliminar este contacto?</p>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form method="POST" action="{% url 'confirm_delete' contact_id=contact.id %}" class="d-inline-block">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger mx-1">
+                        <i class="bi bi-trash3-fill"></i> Confirmar Eliminación
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Fin del modal -->

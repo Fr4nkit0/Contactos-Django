@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "bootstrap": "^5.3.3"
+  },
+  "scripts": {
+    "build:css": "sass scss/styles.scss static/bootstrap/css/bootstrap.min.css --style=compressed",
+    "watch:css": "sass --watch scss/styles.scss:static/bootstrap/css/bootstrap.min.css",
+    "build:js": "cp node_modules/bootstrap/dist/js/*.js static/bootstrap/js/",
+    "watch:js": "watch 'cp node_modules/bootstrap/dist/js/*.js static/bootstrap/js/' node_modules/bootstrap/dist/js/"
+  },
+  "devDependencies": {
+    "sass": "^1.84.0"
+  }
+}
