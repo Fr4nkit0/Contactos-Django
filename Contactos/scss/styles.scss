@@ -1,7 +1,10 @@
 //Nuestras Variables
-$principal: #671499;
-
+$principal: #6750A4;
+$backgroun-principal: rgba(225, 225, 225, 0.2);
 $primary: $principal; // Cambia el color primary
+$secondary: #625B71;
+$ternary: #FFD8E4;
+$danger: #B3261E;
 
 
 @import "../node_modules/bootstrap/scss/functions";
@@ -11,6 +14,17 @@ $primary: $principal; // Cambia el color primary
 @import "../node_modules/bootstrap/scss/maps";
 @import "../node_modules/bootstrap/scss/mixins";
 @import "../node_modules/bootstrap/scss/root";
+$list-group-border-width: 0;
+$list-group-border-color: transparent;
+
+$pagination-bg: $backgroun-principal ;
+$pagination-hover-bg: $backgroun-principal ;
+$pagination-focus-bg: r$backgroun-principal ;
+$pagination-border-width: 0;
+$pagination-border-color: transparent;
+$pagination-margin-start: 0.15rem; // Aumenta la separación entre botones
+$pagination-color: #ffffff; // Color del texto
+
 
 //Estilos creados
 

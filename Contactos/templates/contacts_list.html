@@ -1,0 +1,104 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block 'styles' %}
+<link rel="stylesheet" href="{% static 'css/list_contact.css' %}">
+<link rel="stylesheet" href="{% static 'css/custom.css' %}">
+
+{% endblock %}
+
+{% block contacts %}
+
+
+
+<div class="card mb-2 bg-contact">
+    <div class="card-header  ">
+        <!--Menu Responsivo-->
+        <nav class="navbar navbar-expand-lg bg-body-tertiary bg-contact">
+            <div class="container-fluid  ">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon "></span>
+                </button>
+
+                <button id="ver-todo" class="bg-primary border border-primary rounded-pill px-3 py-2 me-2 ms-3">
+                    <img src="{% static 'img/person-all.svg' %}" class="aling-middle">
+                    <span class="aling-middle ps-1 text-white">Ver todo</span>
+                </button>
+
+                <div class="collapse navbar-collapse mt-2 m-lg-0" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item bg-primary border border-primary rounded-pill px-3">
+
+                            <!-- Botón para abrir el modal -->
+                            <button class="nav-link" aria-current="page" data-bs-toggle="modal"
+                                data-bs-target="#modal-new-contact">
+                                <img src="{% static 'img/new-contact.svg' %}" class="aling-top" alt="Añadir Contacto">
+                                <span class="ps-1 text-white">Añadir Contacto</span>
+                            </button>
+                            <!-- Fin del Boton para Abrir el Modal -->
+                        </li>
+                    </ul>
+                    <!--Cambiar por AJAX-->
+                    <form id="search-form" class="d-flex" role="search" method="get">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <img src="{% static 'img/search-icon.svg' %}" alt="Buscar">
+                            </span>
+                            <input class="form-control" type="text" name="search" id="search-input" placeholder="Buscar"
+                                aria-label="Search" maxlength="30" value="">
+                            <button class="btn btn-primary" type="submit">Buscar</button>
+                        </div>
+                    </form>
+                    <!--Cambiar por AJAX-->
+                </div>
+            </div>
+        </nav>
+        <!--Menu Responsivo-->
+    </div>
+    <div class="card-body">
+        <div class="row " id="contacts-container">
+
+        </div>
+    </div>
+
+</div>
+
+
+<div class="container-page">
+
+</div>
+
+<!-- Modal para Nuevo contacto -->
+<div class="modal fade" id="modal-new-contact" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-form">
+            <div class="modal-header">
+                <h5 class="modal-title text-white" id="modalLabel">Nuevo Contacto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body  bg-form">
+                <form   id ="contactForm" action="{% url 'create_contact' %}" method="POST"     novalidate >
+                    {% csrf_token %}
+                    {% include "form_prueba.html" %}
+                    <div class="col">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                        aria-label="Close">Atras</button>
+                        <input type="submit" value="Enviar" class="btn btn-primary">
+                    </div>
+               
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Fin del modal-->
+
+
+{% endblock contacts %}
+{% block 'extra_js' %}
+<script  type="module" src="{% static 'js/list_contact.js'%}"></script>
+<script src="{% static 'js/bundle.js' %}"></script>
+
+{% endblock 'extra_js' %}

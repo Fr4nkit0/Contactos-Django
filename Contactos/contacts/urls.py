@@ -1,12 +1,15 @@
 from django.urls import path
 from . import views
 urlpatterns = [
-    path('create', views.create_one, name='create_one'),
-    path('update/<int:contact_id>',
-         views.update_by_id, name='update_by_id'),
     path('datail/<int:contact_id>', views.find_by_id, name='find_by_id'),
-    path('', views.find_all, name='find_all'),
     path('delete/<int:contact_id>',
-         views.confirm_delete, name='confirm_delete')
+         views.confirm_delete, name='confirm_delete'),
+    # url con AJAX
+    path('', views.template_list_contact, name='template_list_contact'),
+    path('api/contacts', views.find_all_contact, name='find_all_contact'),
+    path('api/contact/create', views.create_contact, name='create_contact'),
+    path('api/contact/update/<int:contact_id>',
+         views.update_contact, name='update_contact'),
+
 
 ]

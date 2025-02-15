@@ -1,0 +1,6 @@
+.iti {
+    --iti-path-flags-1x: url('/static/img/flags.webp');
+    --iti-path-flags-2x: url('/static/img/flags@2x.webp');
+    --iti-path-globe-1x: url('/static/img/globe.webp');
+    --iti-path-globe-2x: url('/static/img/globe@2x.webp');
+}

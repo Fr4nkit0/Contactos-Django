@@ -1,14 +1,23 @@
 {
   "dependencies": {
-    "bootstrap": "^5.3.3"
+    "bootstrap": "^5.3.3",
+    "intl-tel-input": "^25.3.0"
   },
   "scripts": {
+    "build": "webpack --mode=development",
     "build:css": "sass scss/styles.scss static/bootstrap/css/bootstrap.min.css --style=compressed",
     "watch:css": "sass --watch scss/styles.scss:static/bootstrap/css/bootstrap.min.css",
     "build:js": "cp node_modules/bootstrap/dist/js/*.js static/bootstrap/js/",
     "watch:js": "watch 'cp node_modules/bootstrap/dist/js/*.js static/bootstrap/js/' node_modules/bootstrap/dist/js/"
   },
   "devDependencies": {
-    "sass": "^1.84.0"
+    "@babel/core": "^7.26.7",
+    "@babel/preset-env": "^7.26.7",
+    "babel-loader": "^9.2.1",
+    "css-loader": "^7.1.2",
+    "sass": "^1.84.0",
+    "style-loader": "^4.0.0",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^6.0.1"
   }
 }

@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.http import JsonResponse
 from .models import Contact
 from .forms import ContactForm
 from django.contrib import messages
@@ -6,97 +7,84 @@ from django.core.paginator import Paginator
 from django.http import Http404
 from django.db.models import Q, Value
 from django.db.models.functions import Replace
-
 import re
 from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import csrf_exempt
+
+
+# Utiles
+from .utils import custom_validate_email, validate_phone
+
+
+# @never_cache
+# def find_all(request):
+
+#     search_query = request.GET.get('search', '')
+
+#     if search_query.strip() and len(search_query) <= 30:
+
+#         text_part = ''.join(re.findall(r'[a-zA-Z]+', search_query))
+
+#         number_part = ''.join(re.findall(r'[+\d]+', search_query)).lstrip()
+
+#         query = Q()
+
+#         try:
+#             contacts = Contact.objects.annotate(
+#                 phone_cleaned=Replace(
+#                     # Eliminar espacios
+#                     Replace('phone', Value(' '), Value('')),
+#                     Value('-'), Value('')
+#                 ),
+
+#                 name_cleaned=Replace('name', Value(' '), Value(''))
+#             )
+#         except:
+#             messages.error(request, 'No se encontraron contactos')
+#             return redirect('find_all')
+
+#         if text_part and text_part.strip():
+#             query &= Q(name_cleaned__icontains=text_part)
+
+
+#         if number_part:
+#             query &= Q(phone_cleaned__icontains=number_part)
+#         if not query:
+#             try:
+
+#                 contacts = Contact.objects.all().order_by('name')
+#             except:
+#                 messages.error(request, 'No se encontraron contactos')
+#                 return redirect('find_all')
+#         else:
+#             try:
+
+#                 contacts = contacts.filter(query).order_by('name')
+#             except:
+#                 messages.error(request, 'No se encontraron contactos')
+#                 return redirect('find_all')
+
+#     else:
+#         try:
+#             contacts = Contact.objects.all().order_by('name')
+#             search_query = ""
+#         except:
+#             messages.error(request, 'No se encontraron contactos')
+#             return redirect('find_all')
+
+#     page = request.GET.get('page', 1)
+#     try:
+
+#         paginator = Paginator(contacts, 6)
+
+#         contacts = paginator.page(page)
+#     except:
+#         messages.error(request, 'Pagina no encontrada')
+#         return redirect('find_all')
+#     return render(request, 'list_contacts.html', {'contacts': contacts, 'search_query': search_query})
 
 
 @never_cache
-def find_all(request):
-    """
-    Filtra los contactos según el término de búsqueda y los muestra en una página de resultados paginada.
-
-    **Args:**
-        - `request` (HttpRequest): El objeto de solicitud HTTP que contiene los parámetros de búsqueda y paginación.
-
-    **Return:**
-        - `HttpResponse`: La respuesta que renderiza la plantilla 'list_contacts.html' con los contactos paginados.
-
-    **Raises:**
-        - `Http404`: Si ocurre un error en la paginación (por ejemplo, si la página solicitada no existe).
-        - 'Contact.ObjectDoesNotExist': Si no se encuentra los contactos
-    """
-    # Filtra los contactos por nombre o teléfono basándose en el parámetro 'search'.
-    # Obtén el término de búsqueda
-    search_query = request.GET.get('search', '')
-    # Verificar si la query no está vacía ni contiene solo espacios
-    if search_query.strip() and len(search_query) <= 30:
-        # Usa expresiones regulares para separar los números y las letras
-        # Consideramos que los números y letras están separados por espacios
-        # Extrae solo las letras
-        text_part = ''.join(re.findall(r'[a-zA-Z]+', search_query))
-        # Extrae solo los números
-        number_part = ''.join(re.findall(r'[+\d]+', search_query)).lstrip()
-        # Crea una condición vacía para poder agregarle filtros
-        query = Q()
-        # Si hay texto, agrega el filtro para el nombre
-        # Limpiar el campo `phone` para eliminar espacios y guiones, y el campo `name` para eliminar espacios
-        try:
-            contacts = Contact.objects.annotate(
-                phone_cleaned=Replace(
-                    # Eliminar espacios
-                    Replace('phone', Value(' '), Value('')),
-                    Value('-'), Value('')  # Eliminar guiones
-                ),
-                # Eliminar espacios en el nombre
-                name_cleaned=Replace('name', Value(' '), Value(''))
-            )
-        except:
-            messages.error(request, 'No se encontraron contactos')
-            return redirect('find_all')
-        # Si hay texto, agrega el filtro para el nombre
-        if text_part and text_part.strip():
-            query &= Q(name_cleaned__icontains=text_part)
-
-        # Si hay números, agrega el filtro para el teléfono
-        if number_part:
-            query &= Q(phone_cleaned__icontains=number_part)
-        if not query:
-            try:
-                # Si no hay términos de búsqueda, muestra todos los contactos
-                contacts = Contact.objects.all().order_by('name')
-            except:
-                messages.error(request, 'No se encontraron contactos')
-                return redirect('find_all')
-        else:
-            try:
-                # Aplica el filtro a los contactos
-                contacts = contacts.filter(query).order_by('name')
-            except:
-                messages.error(request, 'No se encontraron contactos')
-                return redirect('find_all')
-
-    else:
-        try:
-            contacts = Contact.objects.all().order_by('name')
-            search_query = ""
-        except:
-            messages.error(request, 'No se encontraron contactos')
-            return redirect('find_all')
-    # Recupera el número de página desde la solicitud GET, por defecto es la página 1.
-    page = request.GET.get('page', 1)
-    try:
-        # Paginación de los contactos: se muestran 3 contactos por página.
-        paginator = Paginator(contacts, 6)
-        # Obtiene los contactos para la página actual.
-        contacts = paginator.page(page)
-    except:
-        messages.error(request, 'Pagina no encontrada')
-        return redirect('find_all')
-    return render(request, 'list_contacts.html', {'contacts': contacts, 'search_query': search_query})
-
-
-@ never_cache
 def find_by_id(request, contact_id):
     """
     Recupera un contacto por su ID y lo muestra en una plantilla de detalle.
@@ -116,87 +104,39 @@ def find_by_id(request, contact_id):
         contact = get_object_or_404(Contact, id=contact_id)
     except:
         messages.error(request, 'Contacto no encontrado ')
-        return redirect('find_all')
+        return redirect('template_list_contact')
     # Renderiza la plantilla 'contact_detail.html' con los detalles del contacto.
     return render(request, 'contact_detail.html', {'contact': contact})
 
+# ======Cambiar por AJAX==========
+# def update_by_id(request, contact_id):
 
-def update_by_id(request, contact_id):
-    """
-    Actualiza los detalles de un contacto existente por su ID.
+#     try:
+#         contact = Contact.objects.get(id=contact_id)
+#     except:
 
-    **Args:**
-        - `request` (HttpRequest): El objeto de solicitud HTTP que contiene los datos del formulario.
-        - `contact_id` (int): El ID del contacto que se desea actualizar.
+#         messages.error(request, 'Contacto no encontrado ')
+#         return redirect('find_all')
+#     if request.method == 'GET':
 
-    **Return:**
-        - `HttpResponse`: La respuesta que renderiza la plantilla 'update_contact.html' con el formulario del contacto.
-        - Si el método es `POST` y el formulario es válido, se guarda el contacto actualizado y se muestra un mensaje de éxito.
+#         form = ContactForm(instance=contact)
+#         return render(request, 'update_contact.html', {'form': form, 'id': contact_id})
+#     if request.method == 'POST':
 
-    **Raises:**
-        - `Contact.DoesNotExist`: Si no se encuentra un contacto con el ID proporcionado.
-    """
-    # Recupera el contacto con el ID proporcionado. Si no existe, lanza una excepción Contact.DoesNotExist.
-    try:
-        contact = Contact.objects.get(id=contact_id)
-    except:
-        # Si ocurre una excepción, muestra un mensaje de error y redirige a la vista 'find_all'.
-        messages.error(request, 'Contacto no encontrado ')
-        return redirect('find_all')
-    if request.method == 'GET':
-        # Si la solicitud es GET, muestra el formulario con los datos actuales del contacto.
-        form = ContactForm(instance=contact)
-        return render(request, 'update_contact.html', {'form': form, 'id': contact_id})
-    if request.method == 'POST':
-        # Si la solicitud es POST, actualiza el contacto con los datos enviados en el formulario.
-        form = ContactForm(request.POST, instance=contact)
-        if form.is_valid():
-            # Si el formulario es válido, guarda los cambios en la base de datos.
-            form.save()
-            return render(request, 'contact_detail.html', {'contact': contact})
-        else:
-            # Si el formulario no es válido, muestra un mensaje de error.
-            messages.error(request, 'Error al actualizar el contacto')
-    # Renderiza la plantilla 'update_contact.html' con el formulario (y el ID del contacto).
-    return render(request, 'update_contact.html', {'form': form, 'id': contact_id})
+#         form = ContactForm(request.POST, instance=contact)
+#         if form.is_valid():
+
+#             form.save()
+#             return render(request, 'contact_detail.html', {'contact': contact})
+#         else:
+
+#             messages.error(request, 'Error al actualizar el contacto')
+
+#     return render(request, 'update_contact.html', {'form': form, 'id': contact_id})
+# ======Cambiar por AJAX==========
 
 
-@ never_cache
-def create_one(request):
-    """
-    Crea un nuevo contacto en la base de datos mediante un formulario.
-
-    **Args:**
-        - `request` (HttpRequest): El objeto de solicitud HTTP que contiene los datos del formulario.
-
-    **Return:**
-        - `HttpResponse`: Si la solicitud es `GET`, renderiza la plantilla 'create_contact.html' con un formulario vacío para crear un nuevo contacto.
-        - Si la solicitud es `POST`, valida el formulario y, si es válido, guarda el nuevo contacto en la base de datos y redirige a la vista 'find_all'.
-        - Si el formulario no es válido, renderiza nuevamente la plantilla 'create_contact.html' con el formulario y un mensaje de error.
-
-    **Raises:**
-        - Ninguna excepción explícita en esta función. Si el formulario no es válido, se maneja internamente.
-    """
-    if request.method == 'GET':
-        # Si la solicitud es GET, muestra el formulario vacío para crear un nuevo contacto.
-        form = ContactForm()
-        return render(request, 'create_contact.html', {'form': form})
-    if request.method == 'POST':
-        # Si la solicitud es POST, crea una instancia del formulario con los datos enviados.
-        form = ContactForm(request.POST)
-        if form.is_valid():
-            # Si el formulario es válido, guarda el nuevo contacto en la base de datos.
-            form.save()
-            # Redirige a la vista 'find_all' después de guardar el contacto.
-            return redirect('find_all')
-        else:
-            # Si el formulario no es válido, muestra un mensaje de error.
-            messages.error(request, 'Error al crear el contacto')
-            # Si el formulario no es válido, vuelve a renderizar la página con el formulario y el error.
-            return render(request, 'create_contact.html', {'form': form})
-
-
-@ never_cache
+@never_cache
 def confirm_delete(request, contact_id):
     """
     Muestra una página de confirmación para la eliminación de un contacto y procesa la eliminación si se confirma.
@@ -218,11 +158,130 @@ def confirm_delete(request, contact_id):
     except:
         # Si no se encuentra el contacto, muestra un mensaje de error y redirige a la vista 'find_all'.
         messages.error(request, 'Contacto no encontrado')
-        return redirect('find_all')
+        return redirect('template_list_contact')
     if request.method == "POST":
         # Si la solicitud es POST, elimina el contacto de la base de datos.
         contact.delete()
         # Redirige a la vista 'find_all' después de eliminar el contacto.
-        return redirect('find_all')
-    # Si la solicitud es GET, muestra la página de confirmación de eliminación.
-    return render(request, 'confirm_delete.html', {'contact': contact})
+        return redirect('template_list_contact')
+
+# ======== FUNCIONALIDAD NUEVA CON JSON ======
+
+
+def find_all_contact(request):
+    # Obtener el número de página desde la solicitud
+    page_number = request.GET.get('page', 1)
+    search_query = request.GET.get('search', '')
+    contacts_per_page = 6  # Número de contactos por página
+    try:
+        # Filtrar contactos si hay un término de búsqueda
+        if search_query.strip() and len(search_query) <= 30:
+
+            text_part = ''.join(re.findall(
+                r'[a-zA-Z\s]+', search_query)).rstrip()
+
+            number_part = ''.join(re.findall(r'[+\d]+', search_query)).lstrip()
+            print(text_part)
+            print(number_part)
+            filters = Q()
+            if text_part:
+                filters &= Q(name__icontains=text_part)
+
+            if number_part:
+                filters &= Q(phone__icontains=number_part)
+            contacts = Contact.objects.filter(filters)
+
+        else:
+            contacts = Contact.objects.all().order_by('name')
+
+        paginator = Paginator(contacts, contacts_per_page)
+        page_obj = paginator.get_page(page_number)
+        # Serializar los contactos de la página actual
+        contacts_list = list(page_obj.object_list.values())
+        return JsonResponse({
+            "contacts": contacts_list,
+            "has_next": page_obj.has_next(),  # Indica si hay una página siguiente
+            "has_previous": page_obj.has_previous(),  # Indica si hay una página anterior
+            "current_page": page_obj.number,  # Número de la página actual
+            "total_pages": paginator.num_pages,  # Número total de páginas
+        }, status=200)
+    except Exception as e:
+        print(f"Error: {e}")
+        return JsonResponse({"error": "Ocurrió un error al obtener los contactos"}, status=500)
+
+
+def template_list_contact(request):
+    return render(request, 'contacts_list.html')
+
+
+def validar_contact(name, phone, email):
+    errors = {}
+    if not name:
+        errors['name'] = 'El nombre es obligatorio.'
+    if len(name) > 25:
+        errors['name'] = 'El nombre debe tener al menos 25 caracteres.'
+    try:
+        custom_validate_email(email)
+    except ValueError as e:
+        errors['email'] = str(e)
+    try:
+        validate_phone(phone)
+    except ValueError as e:
+        errors['phone'] = str(e)
+    return errors
+
+
+@csrf_exempt
+def create_contact(request):
+    if (request.method == 'POST'):
+        name = request.POST.get('name', '')
+        phone = request.POST.get('full_phone_number', '')
+        email = request.POST.get('email', '')
+        print(phone)
+        errors = validar_contact(name, phone, email)
+        # Si hay errores, retornarlos en la respuesta
+        if errors:
+            return JsonResponse({"error": errors}, status=400)
+        try:
+            Contact.objects.create(name=name, phone=phone, email=email)
+            return JsonResponse({"message": "!Contactos Creado Exitosamente"}, status=201)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
+    return JsonResponse({"error": "Método no permitido"}, status=400)
+
+
+@csrf_exempt
+def update_contact(request, contact_id):
+    try:
+        contact = Contact.objects.get(id=contact_id)
+    except Contact.DoesNotExist:
+        return JsonResponse({"error": "Contacto no encontrado"}, status=404)
+    except Exception as e:
+        return JsonResponse({"error": "Error al obtener el contacto:"}, status=400)
+
+    if request.method == 'POST':
+        print(request.POST)
+        name = request.POST.get('name', '')
+        phone = request.POST.get('full_phone_number', '')
+        print("Telefono: " + phone)
+        email = request.POST.get('email', '')
+        errors = validar_contact(name, phone, email)
+        # Si hay errores, retornarlos en la respuesta
+        if errors:
+            return JsonResponse({"error": errors}, status=400)
+        contact.name = name
+        contact.phone = phone
+        contact.email = email
+        try:
+            contact.save()
+            return JsonResponse({
+                "message": "Contacto actualizado exitosamente",
+                "contact": {
+                    "name": contact.name,
+                    "phone": contact.phone,
+                    "email": contact.email
+                }
+            }, status=200)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
+    return JsonResponse({"error": "Método no permitido"}, status=400)

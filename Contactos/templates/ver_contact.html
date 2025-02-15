@@ -1,55 +1,101 @@
 {% load static %}
 
-<div class="card" style="width: 25rem;">
+<div class="card bg-contact" style="width: 25rem;">
     <div class="header d-flex justify-content-center">
-        <i class="bi bi-person-circle" style="font-size: 5rem;"></i>
+        <div class="contact-avatar mt-2" data-name="{{ contact.name }}"> </div>
     </div>
     <div class="card-body ">
         <ul class="list-group list-group-flush">
-            <li class="list-group-item">
-              <p class="text-center fw-bold text-primary">{{ contact.name }}</p>
+            <li class="list-group-item bg-contact">
+                <p class="text-center fw-bold text-white  ">{{ contact.name }}</p>
             </li>
-            <li class="list-group-item d-flex align-items-center">
-               <img src="{% static 'img/telephone.svg'%}" class="btn btn-outline-primary me-2"  alt=""> <span> {{ contact.phone }} </span>
+            <li class="list-group-item d-flex align-items-center bg-contact">
+                <div class="icon-box border border-primary rounded-pill bg-primary px-3 py-1 me-2  d-none d-sm-block">
+                    <img src="{% static 'img/phone-solid-white.svg'%}" alt="">
+                </div>
+                <a href="https://wa.me/{{ contact.phone }}" target="_blank"
+                    class="align-middle text-break text-white text-decoration-none">
+                    {{ contact.phone }}
+                </a>
             </li>
-            <li class="list-group-item">
-               <img src="{% static 'img/envelope.svg' %}" class = "btn btn-outline-primary me-2" alt=""> <span class="aling-middle">{{ contact.email }}</span>
+            <li class="list-group-item d-flex align-items-center bg-contact">
+                <div class="icon-box border border-primary rounded-pill bg-primary px-3 py-1 me-2 d-none d-sm-block">
+                    <img src="{% static 'img/envelope-solid-white.svg' %}" alt="">
+                </div>
+                <span class="aling-middle text-break text-white">{{ contact.email }}</span>
             </li>
         </ul>
     </div>
 
     <div class="card-footer d-flex align-items-center justify-content-center">
-        <a href="{% url 'find_all' %}" class="btn btn-outline-primary mx-1">
-            <i class="bi bi-box-arrow-left mx-1"></i> Atras 
+        <a href="{% url 'template_list_contact' %}" class="btn btn-primary mx-1">
+            <img src="{%static 'img/box-arrow-left.svg'%}" alt=""> Atras
         </a>
-        <a href="{% url 'update_by_id' contact_id=contact.id %}" class="btn btn-outline-secondary mx-1">
-            <i class="bi bi-pencil-square"></i> Editar
-        </a>
-        <button class="btn btn-outline-danger mx-1" data-bs-toggle="modal"
-            data-bs-target="#modal-delete{{ contact.id }}">
-            <i class="bi bi-trash3-fill"></i> Eliminar
+        <!--Btn Modal Para actualizar Contacto-->
+        <button class="btn btn-secondary mx-1" data-bs-toggle="modal" data-bs-target="#modal-update">
+            <img src="{% static 'img/pencil-solid.svg'%}" alt="">
+            <span class="align-text-middle ml-1">Editar</span>
         </button>
+        <!--Fin Btn Modal Para actualizar Contacto-->
+        <!--Btn Modal Para Eliminar Contacto-->
+        <button class="btn btn-danger mx-1" data-bs-toggle="modal" data-bs-target="#modal-delete">
+            <img src="{% static 'img/trash3-fill.svg' %}" alt="">
+            <span class="align-text-middle ml-1">Eliminar</span>
+        </button>
+        <!--Fin Btn Modal Para Eliminar Contacto-->
+
     </div>
 
 </div>
-      
-<!-- Modal para eliminar contacto -->
-<div class="modal fade" id="modal-delete{{ contact.id }}" tabindex="-1" aria-labelledby="modalLabel{{ contact.id }}"
-    aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
+<!-- Modal para Actualizar contacto -->
+<div class="modal fade " id="modal-update" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog ">
+        <div class="modal-content bg-form">
             <div class="modal-header">
-                <h5 class="modal-title" id="modalLabel{{ contact.id }}">Confirmación de Eliminación</h5>
+                <h5 class="modal-title text-white" id="modalLabel">Actualizar Contacto</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body text-center">
-                <p>¿Estás seguro de que deseas eliminar este contacto?</p>
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <form method="POST" action="{% url 'confirm_delete' contact_id=contact.id %}" class="d-inline-block">
+            <div class="modal-body  bg-form">
+                <form id="contactForm" action="{% url 'update_contact' contact_id=contact.id   %}" method="POST"
+                    novalidate>
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-outline-danger mx-1">
-                        <i class="bi bi-trash3-fill"></i> Confirmar Eliminación
-                    </button>
+
+                    {% include "form_prueba.html" %}
+                    <div class="col">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                            aria-label="Close">Atras</button>
+                        <input type="submit" value="Enviar" class="btn btn-primary">
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Fin del modal-->
+
+<!-- Modal para eliminar contacto -->
+<div class="modal fade " id="modal-delete" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog ">
+        <div class="modal-content bg-contact">
+            <div class="modal-header">
+                <h5 class="modal-title text-white" id="modalLabel">Confirmación de Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center bg-contact">
+                <p class="text-white">¿Estás seguro de que deseas eliminar este contacto?</p>
+
+                <form class="row" method="POST" action="{% url 'confirm_delete' contact_id=contact.id %}">
+                    {% csrf_token %}
+                    <div class="col">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger mx-1">
+                            <img src="{% static 'img/trash3-fill.svg' %}" alt="">
+                            <span class="align-text-middle ml-1">Confirmar Eliminación</span>
+                        </button>
+                    </div>
+
+
                 </form>
             </div>
         </div>

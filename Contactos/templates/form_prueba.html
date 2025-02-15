@@ -1,0 +1,22 @@
+<div class="col-12 mb-2">
+    <label class="form-label text-white" for="name">Nombre</label>
+    <input type="text" class="form-control" id="name" name="name" placeholder="Ingresa tu nombre"
+        value="{% if contact.name %}{{ contact.name }}{% endif %}" required  maxlength="25">
+    <div  class="text-bold">No se permite dejar vacio este campo</div> <!-- Mensaje genérico -->
+</div>
+
+<div class="col-12 mb-2">
+    <label class="form-label text-white" for="email">Correo Electrónico</label>
+    <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com"
+        value="{% if contact.email %}{{ contact.email }}{% endif %}" required>
+    <div class="text-bold">Ingresa un correo electrónico válido.</div> <!-- Mensaje genérico -->
+</div>
+
+<div class="col-12 mb-2">
+    <label class="form-label text-white d-block" for="phone">Teléfono</label>
+    <div class="w-100"> <!-- Asegura que el contenedor ocupe todo el ancho -->
+        <input type="tel" class="form-control w-100" id="phone" name="phone" placeholder="Ingresa tu número"
+            value="{% if contact.phone %}{{ contact.phone }}{% endif %}">
+    </div>
+    <div class="text-bold">Solo se permiten dígitos.</div>
+</div>

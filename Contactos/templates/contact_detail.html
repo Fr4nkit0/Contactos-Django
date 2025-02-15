@@ -1,8 +1,14 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
+{% block 'styles' %}
+<link rel="stylesheet" href="{% static 'css/custom.css' %}">
+{% endblock %}
 {% block contacts %}
     <div class="container d-flex justify-content-center align-content-center">
      {% include "ver_contact.html" %}
     </div>
-   
 {% endblock contacts %}
+{% block 'extra_js' %}
+<script   type="module"  src="{% static 'js/detail.js' %}"></script>
+<script src="{% static 'js/bundle.js' %}"></script>
+{% endblock  %}

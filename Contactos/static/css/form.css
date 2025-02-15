@@ -1,0 +1,10 @@
+.custom-error-placeholder {
+    min-height: 1.5rem;
+    /* Reserva espacio */
+    visibility: hidden;
+    /* Oculta el texto pero mantiene el espacio */
+}
+
+.custom-error-placeholder.show {
+    visibility: visible;
+}
