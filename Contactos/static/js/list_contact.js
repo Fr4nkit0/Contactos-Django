@@ -1,6 +1,7 @@
 
 import { handleFormSubmission } from './form.js'
 // Delegación de eventos para mouseenter y mouseleave
+// Delegación de eventos para mouseenter y mouseleave
 $("#contacts-container").on("mouseenter", ".contact", function () {
     // Cambiar estilos e imágenes para el ícono de email
     $(this).find(".email")
