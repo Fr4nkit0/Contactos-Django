@@ -1,113 +1,127 @@
 
 import { handleFormSubmission } from './form.js'
-// Delegación de eventos para mouseenter y mouseleave
-// Delegación de eventos para mouseenter y mouseleave
-$("#contacts-container").on("mouseenter", ".contact", function () {
-    // Cambiar estilos e imágenes para el ícono de email
-    $(this).find(".email")
-        .removeClass("border-primary")
-        .addClass("border-primary bg-primary")
-        .find("img")
-        .attr("src", "static/img/envelope-solid-white.svg");
-    // Cambiar estilos e imágenes para el ícono de teléfono
-    $(this).find(".phone")
-        .removeClass("border-primary")
-        .addClass("border-primary bg-primary")
-        .find("img")
-        .attr("src", "static/img/phone-solid-white.svg");
+// Delegación de eventos para mouseover y mouseout
+document.getElementById("contacts-container").addEventListener("mouseover", function (event) {
+    // Verifica si el cursor está sobre un elemento con la clase ".contact" o uno de sus hijos
+    const contact = event.target.closest(".contact");
+    if (contact) {
+        // Cambiar estilos e imágenes para el ícono de email
+        const emailIcon = contact.querySelector(".email");
+        if (emailIcon) {
+            emailIcon.classList.remove("border-primary");
+            emailIcon.classList.add("border-primary", "bg-primary");
+            const emailImg = emailIcon.querySelector("img");
+            emailImg.src = "static/img/envelope-solid-white.svg";
+        }
+        // Cambiar estilos e imágenes para el ícono de teléfono
+        const phoneIcon = contact.querySelector(".phone");
+        if (phoneIcon) {
+            phoneIcon.classList.remove("border-primary");
+            phoneIcon.classList.add("border-primary", "bg-primary");
+            const phoneImg = phoneIcon.querySelector("img");
+            phoneImg.src = "static/img/phone-solid-white.svg";
+        }
+    }
 });
 
-$("#contacts-container").on("mouseleave", ".contact", function () {
+document.getElementById("contacts-container").addEventListener("mouseout", function (event) {
+    // Verifica si el cursor sale de un elemento con la clase ".contact" o uno de sus hijos
+    const contact = event.target.closest(".contact");
+    if (contact) {
+        // Restaurar estilos e imágenes para el ícono de email
+        const emailIcon = contact.querySelector(".email");
+        if (emailIcon) {
+            emailIcon.classList.remove("border-primary", "bg-primary");
+            emailIcon.classList.add("border-primary");
+            const emailImg = emailIcon.querySelector("img");
+            emailImg.src = "static/img/envelope-solid.svg";
+        }
 
-
-    // Restaurar estilos e imágenes para el ícono de email
-    $(this).find(".email")
-        .removeClass("border-primary bg-primary")
-        .addClass("border-primary")
-        .find("img")
-        .attr("src", "static/img/envelope-solid.svg");
-    // Restaurar estilos e imágenes para el ícono de teléfono
-    $(this).find(".phone")
-        .removeClass("border-primary bg-primary")
-        .addClass("border-primary")
-        .find("img")
-        .attr("src", "static/img/phone-solid.svg");
+        // Restaurar estilos e imágenes para el ícono de teléfono
+        const phoneIcon = contact.querySelector(".phone");
+        if (phoneIcon) {
+            phoneIcon.classList.remove("border-primary", "bg-primary");
+            phoneIcon.classList.add("border-primary");
+            const phoneImg = phoneIcon.querySelector("img");
+            phoneImg.src = "static/img/phone-solid.svg";
+        }
+    }
 });
+
 function generateAvatar(name, avatarElement) {
     if (!name) {
-        $(avatarElement).text("?"); // Si no hay nombre, mostrar un "?"
+        avatarElement.textContent = "?"; // Si no hay nombre, mostrar un "?"
         return;
     }
-
     const initial = name.charAt(0).toUpperCase();
-    $(avatarElement).text(initial);
-
+    avatarElement.textContent = initial;
 }
+
 function listContact(page = 1, search = '') {
+    const url = new URL("api/contacts", window.location.origin);
+    url.searchParams.append("page", page);
+    if (search) {
+        url.searchParams.append("search", search);
+    }
+    fetch(url)
+        .then(reponse => reponse.json())
+        .then(data => {
+            const contactsContainer = document.getElementById("contacts-container");
+            contactsContainer.innerHTML = "";
 
-    $.ajax({
-        url: "api/contacts",  // URL de la API
-        type: "GET",
-        data: { page: page, search: search },
-        dataType: "json",
-        success: function (response) {
-            $("#contacts-container").empty();
-            if (response.contacts && response.contacts.length > 0) {
-                // Generar el HTML para cada contacto
-                response.contacts.forEach(function (contact) {
-                    let contactHtml = `
-                        <div class="col-12 col-md-6 col-lg-6 col-xl-4 mb-3">
-                            <a href="datail/${contact.id}" class="text-decoration-none text-dark">
-
-                                <div class="card contact bg-contact">
-                                    <div class="header d-flex justify-content-center align-items-center">
-                                        <div class="contact-avatar mt-2" data-name="${contact.name}"></div>
-                                    </div>
-                                    <div class="card-body">
-                                        <ul class="list-group list-group-flush">
-                                            <li class="list-group-item bg-contact">
-                                                <p class="fw-bold text-white text-start text-sm-center">${contact.name}</p>
-                                            </li>
-                                            <li class="list-group-item d-flex align-items-center bg-contact">
-                                                <div class="icon-box border border-primary rounded-pill px-3 py-1 me-2 d-none d-sm-block email phone">
-                                                    <img src="static/img/phone-solid.svg" alt="Teléfono">
-                                                </div>
-                                                <span class="aling-middle text-break text-white text-center text-sm-start">${contact.phone}</span>
-                                            </li>
-                                            <li class="list-group-item d-flex align-items-center bg-contact">
-                                                <div class="icon-box border border-primary rounded-pill px-3 py-1 me-2 d-none d-sm-block email">
-                                                    <img src="static/img/envelope-solid.svg" alt="">
-                                                </div>
-                                                <span class="aling-middle text-break text-white text-center text-sm-start">${contact.email}</span>
-                                            </li>
-                                        </ul>
-                                    </div>
+            if (data.contacts && data.contacts.length > 0) {
+                data.contacts.forEach(contact => {
+                    const contactHtml = `
+                    <div class="col-12 col-md-6 col-lg-6 col-xl-4 mb-3">
+                        <a href="datail/${contact.id}" class="text-decoration-none text-dark">
+                            <div class="card contact bg-contact">
+                                <div class="header d-flex justify-content-center align-items-center">
+                                    <div class="contact-avatar mt-2" data-name="${contact.name}"></div>
                                 </div>
-                            </a>
-                        </div>
+                                <div class="card-body">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item bg-contact">
+                                            <p class="fw-bold text-white text-start text-sm-center">${contact.name}</p>
+                                        </li>
+                                        <li class="list-group-item d-flex align-items-center bg-contact">
+                                            <div class="icon-box border border-primary rounded-pill px-3 py-1 me-2 d-none d-sm-block  phone">
+                                                <img src="static/img/phone-solid.svg" alt="Teléfono">
+                                            </div>
+                                            <span class="aling-middle text-break text-white text-center text-sm-start">${contact.phone}</span>
+                                        </li>
+                                        <li class="list-group-item d-flex align-items-center bg-contact">
+                                            <div class="icon-box border border-primary rounded-pill px-3 py-1 me-2 d-none d-sm-block email">
+                                                <img src="static/img/envelope-solid.svg" alt="">
+                                            </div>
+                                            <span class="aling-middle text-break text-white text-center text-sm-start">${contact.email}</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
                     `;
-
-                    // Agregar el contacto al contenedor
-                    $("#contacts-container").append(contactHtml);
-                    // Iterar sobre todas las tarjetas y asignar el avatar
-                    $(".contact-avatar").each(function () {
-                        const name = $(this).data("name");
-                        generateAvatar(name, this);
-                    });
-                    generatePagination(response.current_page, response.total_pages, search);
+                    contactsContainer.innerHTML += contactHtml;
                 });
+                // Generar avatares después de que el DOM esté completamente cargado
+                document.querySelectorAll(".contact-avatar").forEach(avatarElement => {
+                    const name = avatarElement.getAttribute("data-name");
+                    generateAvatar(name, avatarElement);
+                });
+                generatePagination(data.current_page, data.total_pages, search);
             } else {
-                // Mostrar un mensaje si no hay contactos
-                $("#contacts-container").html('<div class="col-12 text-center"><p>No se encontraron contactos.</p></div>');
+                contactsContainer.innerHTML = "<p>No se encontraron contactos.</p>";
             }
-        },
-        error: function (xhr, status, error) {
-            console.error("Error al cargar los contactos:", error);
-            $("#contacts-container").html('<div class="col-12 text-center"><p>Ocurrió un error al cargar los contactos.</p></div>');
-        }
-    });
+        })
+        .catch(error => {
+            document.getElementById("contacts-container")
+                .innerHTML = '<div class="col-12 text-center"><p>Ocurrió un error al cargar los contactos.</p></div>';
+        });
+
 }
 function generatePagination(currentPage, totalPages, currentSearch) {
+    const paginationContainer = document.querySelector(".container-page");
+
     let paginationHtml = '<nav aria-label="Page navigation"><ul class="pagination justify-content-center">';
 
     // Botón "Anterior"
@@ -168,55 +182,43 @@ function generatePagination(currentPage, totalPages, currentSearch) {
     }
 
     paginationHtml += '</ul></nav>';
-    $(".container-page").html(paginationHtml);
-}
+    paginationContainer.innerHTML = paginationHtml;
 
+}
 // Delegación de eventos para la paginación
-$(document).on("click", ".page-link", function (e) {
-    e.preventDefault();  // Evitar el comportamiento predeterminado del enlace
-    const page = $(this).data("page");
-    const search = $(this).data('search');
-    listContact(page, search); // Llamar a listContact con la nueva página y la misma búsqueda
+document.addEventListener("click", function (event) {
+    if (event.target.closest(".page-link")) {
+        event.preventDefault();
+        const page = event.target.getAttribute("data-page");
+        const search = event.target.getAttribute("data-search");
+        listContact(page, search);
+    }
 });
 
-
-// Llamar a la función cuando el DOM esté listo
-$(document).ready(function () {
+document.addEventListener("DOMContentLoaded", function () {
     listContact();
-    // Evento click para el botón "Ver todo"
-    $('#ver-todo').click(function (event) {
-        event.preventDefault(); // Previene cualquier comportamiento por defecto
-        event.stopPropagation(); // Evita que el evento se propague
-        listContact(1); // Llama a listContact con la página uno
-        $('#search-input').val("");
-    });
+
     // Función para realizar la búsqueda
     function performSearch(searchTerm) {
-        console.log("Realizando búsqueda:", searchTerm); // Depuración
-        listContact(1, searchTerm); // Llamar a listContact con la página 1 y el término de búsqueda
+        listContact(1, searchTerm);
     }
-
-    // Capturar el evento input para la búsqueda en tiempo real
-    $('#search-input').on('input', function (event) {
-        const currentSearch = $(this).val(); // Obtener el término de búsqueda
-        performSearch(currentSearch); // Realizar la búsqueda
+    document.getElementById('search-form').addEventListener('submit', function (event) {
+        event.preventDefault();
+        const currentSearch = document.getElementById('search-input').value;
+        performSearch(currentSearch);
     });
-
-    // Capturar el evento submit del formulario de búsqueda
-    $('#search-form').on('submit', function (event) {
-        event.preventDefault(); // Evitar que el formulario se envíe
-        const currentSearch = $('#search-input').val(); // Obtener el término de búsqueda
-        performSearch(currentSearch); // Realizar la búsqueda
+    document.getElementById('search-input').addEventListener('input', function (event) {
+        const currentSearch = this.value;
+        performSearch(currentSearch);
     });
-
     // Usando el manejador para el formulario de contacto
-    handleFormSubmission("#contactForm", function (response) {
-        $("#modal-new-contact").modal("hide");
-        listContact();
+    handleFormSubmission("contactForm", function (response) {
+        const modal = document.getElementById("modal-new-contact");
+        if (modal) {
+            modal.style.display = 'none'; // Oculta el modal sin jQuery
+        }
+        listContact(); // Asumiendo que `listContact` es una función que actualiza la lista de contactos
     }, function (error) {
         console.log(error);
-
     });
-
-
-}); 
+})

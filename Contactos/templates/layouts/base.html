@@ -4,8 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="data:,"> <!-- Evita que el navegador solicite el favicon -->
-
     <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/style.css'%}" >
    
@@ -33,7 +31,6 @@
  
     <!-- Bootstrap JavaScript Bundle (incluye Popper.js) -->
     <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="{% static 'js/main.js' %}"></script>
     {% block  'extra_js'%}
     {% endblock  %}

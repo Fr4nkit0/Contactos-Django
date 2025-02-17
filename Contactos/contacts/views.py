@@ -16,74 +16,6 @@ from django.views.decorators.csrf import csrf_exempt
 from .utils import custom_validate_email, validate_phone
 
 
-# @never_cache
-# def find_all(request):
-
-#     search_query = request.GET.get('search', '')
-
-#     if search_query.strip() and len(search_query) <= 30:
-
-#         text_part = ''.join(re.findall(r'[a-zA-Z]+', search_query))
-
-#         number_part = ''.join(re.findall(r'[+\d]+', search_query)).lstrip()
-
-#         query = Q()
-
-#         try:
-#             contacts = Contact.objects.annotate(
-#                 phone_cleaned=Replace(
-#                     # Eliminar espacios
-#                     Replace('phone', Value(' '), Value('')),
-#                     Value('-'), Value('')
-#                 ),
-
-#                 name_cleaned=Replace('name', Value(' '), Value(''))
-#             )
-#         except:
-#             messages.error(request, 'No se encontraron contactos')
-#             return redirect('find_all')
-
-#         if text_part and text_part.strip():
-#             query &= Q(name_cleaned__icontains=text_part)
-
-
-#         if number_part:
-#             query &= Q(phone_cleaned__icontains=number_part)
-#         if not query:
-#             try:
-
-#                 contacts = Contact.objects.all().order_by('name')
-#             except:
-#                 messages.error(request, 'No se encontraron contactos')
-#                 return redirect('find_all')
-#         else:
-#             try:
-
-#                 contacts = contacts.filter(query).order_by('name')
-#             except:
-#                 messages.error(request, 'No se encontraron contactos')
-#                 return redirect('find_all')
-
-#     else:
-#         try:
-#             contacts = Contact.objects.all().order_by('name')
-#             search_query = ""
-#         except:
-#             messages.error(request, 'No se encontraron contactos')
-#             return redirect('find_all')
-
-#     page = request.GET.get('page', 1)
-#     try:
-
-#         paginator = Paginator(contacts, 6)
-
-#         contacts = paginator.page(page)
-#     except:
-#         messages.error(request, 'Pagina no encontrada')
-#         return redirect('find_all')
-#     return render(request, 'list_contacts.html', {'contacts': contacts, 'search_query': search_query})
-
-
 @never_cache
 def find_by_id(request, contact_id):
     """
@@ -107,33 +39,6 @@ def find_by_id(request, contact_id):
         return redirect('template_list_contact')
     # Renderiza la plantilla 'contact_detail.html' con los detalles del contacto.
     return render(request, 'contact_detail.html', {'contact': contact})
-
-# ======Cambiar por AJAX==========
-# def update_by_id(request, contact_id):
-
-#     try:
-#         contact = Contact.objects.get(id=contact_id)
-#     except:
-
-#         messages.error(request, 'Contacto no encontrado ')
-#         return redirect('find_all')
-#     if request.method == 'GET':
-
-#         form = ContactForm(instance=contact)
-#         return render(request, 'update_contact.html', {'form': form, 'id': contact_id})
-#     if request.method == 'POST':
-
-#         form = ContactForm(request.POST, instance=contact)
-#         if form.is_valid():
-
-#             form.save()
-#             return render(request, 'contact_detail.html', {'contact': contact})
-#         else:
-
-#             messages.error(request, 'Error al actualizar el contacto')
-
-#     return render(request, 'update_contact.html', {'form': form, 'id': contact_id})
-# ======Cambiar por AJAX==========
 
 
 @never_cache

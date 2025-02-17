@@ -1,17 +1,22 @@
 import { handleFormSubmission } from './form.js'
 
-$(document).ready(function () {
-    console.log("ready!");
-    handleFormSubmission("#contactForm", function (response) {
-        console.log(response)
-        $("#modal-update").modal("hide");
-        $("#contactForm").trigger("reset");
+document.addEventListener("DOMContentLoaded", function () {
+    handleFormSubmission("contactForm", function (response) {
+        // Ocultar el modal
+        const modal = document.getElementById("modal-new-contact");
+        if (modal) {
+            const bootstrapModal = new bootstrap.Modal(modal); // Crear una nueva instancia del modal
+            bootstrapModal.hide(); // Ocultar el modal
+        }
 
-        window.location.reload(); // Recarga toda la página
+        // Reiniciar el formulario
+        const contactForm = document.getElementById("contactForm");
+        if (contactForm) {
+            contactForm.reset(); // Reiniciar el formulario
+        }
 
+        window.location.reload(); // Recargar la página
     }, function (error) {
-        console.log(error)
-
+        console.log(error);
     });
-
 });

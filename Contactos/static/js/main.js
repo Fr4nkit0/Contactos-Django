@@ -1,19 +1,19 @@
 function generateAvatar(name, avatarElement) {
     if (!name) {
-        $(avatarElement).text("?"); // Si no hay nombre, mostrar un "?"
+        avatarElement.textContent = "?"; // Si no hay nombre, mostrar un "?"
         return;
     }
 
-    const initial = name.charAt(0).toUpperCase();
-    $(avatarElement).text(initial);
-
+    const initial = name.charAt(0).toUpperCase(); // Obtener la primera letra y convertirla a mayúscula
+    avatarElement.textContent = initial; // Asignar la inicial al contenido del elemento
 }
-$(document).ready(function () {
-    // Iterar sobre todas las tarjetas y asignar el avatar
-    $(".card").each(function () {
-        const name = $(this).find(".contact-avatar").data("name"); // Obtener el nombre desde el atributo data-name
-        const avatarElement = $(this).find(".contact-avatar"); // Obtener el contenedor del avatar
-        generateAvatar(name, avatarElement); // Llamar a la función para generar el avatar
+
+document.addEventListener("DOMContentLoaded", function () {
+    // Generar avatares después de que el DOM esté completamente cargado
+    const avatarElements = document.querySelectorAll(".contact-avatar"); // Obtener todos los elementos con la clase .contact-avatar
+
+    avatarElements.forEach(function (avatarElement) {
+        const name = avatarElement.dataset.name; // Obtener el nombre desde el atributo data-name
+        generateAvatar(name, avatarElement); // Generar el avatar para cada elemento
     });
 });
-
